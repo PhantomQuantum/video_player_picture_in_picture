@@ -9,9 +9,9 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
 video_player_picture_in_picture
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/PhantomQuantum/video_player_picture_in_picture'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'PhantomQuantum' => 'jackDoe@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'

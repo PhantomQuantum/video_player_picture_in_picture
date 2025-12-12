@@ -15,6 +15,10 @@ dependencies:
     git:
       url: git@github.com:PhantomQuantum/video_player.git
       ref: master
+#  video_player:
+#    path: G:/github/app/packages/packages/video_player/video_player
+#  video_player_android:
+#    path: G:/github/app/packages/packages/video_player/video_player_android
 
 dev_dependencies:
   flutter_test:
