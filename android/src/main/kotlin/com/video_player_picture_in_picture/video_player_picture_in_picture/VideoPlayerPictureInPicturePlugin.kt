@@ -83,7 +83,7 @@ class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, Activ
                 val minAllowed = 0.418f
                 val maxAllowed = 2.39f
                 if (ratio in minAllowed..maxAllowed) {
-                    Rational(customWidth!!, customHeight!!)
+                    Rational(customWidth!!.toInt(), customHeight!!.toInt())
                 } else {
                     Log.w(TAG, "Custom width/height ratio out of bounds, defaulting to 16:9")
                     defaultAspectRatio
