@@ -69,62 +69,106 @@ class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, Activ
     private fun isPipSupported(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 
     private fun enterPipMode(): Boolean {
-        if (!isPipSupported() || activity == null) {
+        val activity = activity ?: run {
             Log.w(TAG, "PiP not supported or activity is null")
             return false
         }
 
-        try {
+        if (!isPipSupported()) {
+            Log.w(TAG, "PiP not supported on this device")
+            return false
+        }
+
+        // 🔥 核心修复：必须保证 Activity 正处于 resumed，否则必崩
+        if (!activity.hasWindowFocus()) {
+            Log.w(TAG, "Activity is not resumed, skip PiP")
+            return false
+        }
+
+        return try {
             val paramsBuilder = PictureInPictureParams.Builder()
 
-            // 使用 Flutter 层传入的宽高，如果没有则使用默认 16:9
-            val aspectRatio = if (customWidth != null && customHeight != null) {
-                val ratio = customWidth!!.toFloat() / customHeight!!.toFloat()
-                val minAllowed = 0.418f
-                val maxAllowed = 2.39f
-                if (ratio in minAllowed..maxAllowed) {
-                    Rational(customWidth!!.toInt(), customHeight!!.toInt())
-                } else {
-                    Log.w(TAG, "Custom width/height ratio out of bounds, defaulting to 16:9")
-                    defaultAspectRatio
+            // ---- 设置宽高比例 ----
+            val aspectRatio = when {
+                customWidth != null && customHeight != null -> {
+                    val ratio = customWidth!!.toFloat() / customHeight!!.toFloat()
+                    val minAllowed = 0.418f
+                    val maxAllowed = 2.39f
+
+                    if (ratio in minAllowed..maxAllowed) {
+                        Rational(
+                            customWidth!!.toInt(),
+                            customHeight!!.toInt()
+                        )
+                    } else {
+                        Log.w(TAG, "Custom ratio out of bounds, using default 16:9")
+                        defaultAspectRatio
+                    }
                 }
-            } else {
-                defaultAspectRatio
+
+                else -> defaultAspectRatio
             }
 
             paramsBuilder.setAspectRatio(aspectRatio)
 
-            // Android 12+ 支持 seamless resize
+            // ---- Android 12+ seamless resize + sourceRectHint ----
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 paramsBuilder.setSeamlessResizeEnabled(true)
-                // 尝试使用 Activity 根视图作为 source rect
-                val rootView = activity?.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0)
+
+                val rootView =
+                    activity.findViewById<ViewGroup>(android.R.id.content)?.getChildAt(0)
                 rootView?.let {
                     val loc = IntArray(2)
                     it.getLocationInWindow(loc)
-                    val rect = Rect(loc[0], loc[1], loc[0] + it.width, loc[1] + it.height)
+                    val rect = Rect(
+                        loc[0],
+                        loc[1],
+                        loc[0] + it.width,
+                        loc[1] + it.height
+                    )
                     paramsBuilder.setSourceRectHint(rect)
                     Log.d(TAG, "Set sourceRectHint: $rect")
                 }
             }
 
-            val params = paramsBuilder.build()
-            val success = activity?.enterPictureInPictureMode(params) ?: false
+            val success = activity.enterPictureInPictureMode(paramsBuilder.build())
             isInPipMode = success
-            return success
+            success
+
         } catch (e: Exception) {
             Log.e(TAG, "Error entering PiP mode", e)
-            return false
+            false
         }
     }
 
     private fun exitPipMode(): Boolean {
-        if (!isPipSupported() || activity == null) return false
-        if (!isInPipMode) return false
-        isInPipMode = false
-        notifyFlutterPipChanged()
-        return true
+        val activity = activity ?: return false
+        if (!isPipSupported()) return false
+
+        // 只有真的在 PiP 时才执行
+        if (!activity.isInPictureInPictureMode) {
+            isInPipMode = false
+            return false
+        }
+
+        try {
+            // 标记退出
+            isInPipMode = false
+
+            // 通知 Flutter
+            notifyFlutterPipChanged()
+
+            // Android 会在 PiP 退出后自动恢复 Activity，
+            // 我们通过恢复 UI 和 window flags 来确保干净退出。
+            restoreUiAfterPip(activity)
+
+            return true
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in exitPipMode()", e)
+            return false
+        }
     }
+
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
         activity = binding.activity
