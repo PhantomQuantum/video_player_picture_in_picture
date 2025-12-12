@@ -51,8 +51,11 @@ class VideoPlayerPictureInPicture {
   /// await controller.initialize();
   /// await VideoPlayerPip.enterPipMode(controller, width: 300, height: 200);
   /// ```
-  static Future<bool> enterPipMode(VideoPlayerController controller, double width, double height) {
+  static Future<bool> enterPipMode(VideoPlayerController controller) {
     // iOS implementation uses native PiP
+    Size size = controller.value.size;
+    double width = size.width;
+    double height = size.height;
     return _platform.enterPipMode(width, height);
   }
 
@@ -101,7 +104,7 @@ class VideoPlayerPictureInPicture {
     if (isInPip) {
       return await exitPipMode();
     } else {
-      return await enterPipMode(controller, width, height);
+      return await enterPipMode(controller);
     }
   }
 

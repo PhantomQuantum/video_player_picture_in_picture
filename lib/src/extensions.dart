@@ -8,7 +8,7 @@ extension VideoPlayerControllerExtension on VideoPlayerController {
 
   /// Enters PiP mode for the specified player ID.
   Future<bool> enterPipMode({required double width, required double height}) {
-    return VideoPlayerPictureInPicture.enterPipMode(this, width, height);
+    return VideoPlayerPictureInPicture.enterPipMode(this);
   }
 
   /// Exits PiP mode.
