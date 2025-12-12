@@ -17,6 +17,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import androidx.lifecycle.Lifecycle
 
 class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     private val TAG = "VideoPlayerPictureInPicturePlugin"
@@ -79,9 +80,8 @@ class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, Activ
             return false
         }
 
-        // 🔥 核心修复：必须保证 Activity 正处于 resumed，否则必崩
-        if (!activity.hasWindowFocus()) {
-            Log.w(TAG, "Activity is not resumed, skip PiP")
+        if (activity.lifecycle.currentState != Lifecycle.State.RESUMED) {
+            Log.w(TAG, "Activity is not resumed — skip PiP")
             return false
         }
 
