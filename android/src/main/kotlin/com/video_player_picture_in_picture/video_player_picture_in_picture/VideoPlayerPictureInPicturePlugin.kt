@@ -158,10 +158,6 @@ class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, Activ
             // 通知 Flutter
             notifyFlutterPipChanged()
 
-            // Android 会在 PiP 退出后自动恢复 Activity，
-            // 我们通过恢复 UI 和 window flags 来确保干净退出。
-            restoreUiAfterPip(activity)
-
             return true
         } catch (e: Exception) {
             Log.e(TAG, "Error in exitPipMode()", e)
