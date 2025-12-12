@@ -28,7 +28,7 @@ abstract class VideoPlayerPictureInPicturePlatformInterface extends PlatformInte
   }
 
   /// Enters PiP mode for the specified player ID.
-  Future<bool> enterPipMode(int playerId, {int? width, int? height}) {
+  Future<bool> enterPipMode(double width, double height) {
     throw UnimplementedError('enterPipMode() has not been implemented.');
   }
 

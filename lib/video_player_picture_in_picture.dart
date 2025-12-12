@@ -51,14 +51,9 @@ class VideoPlayerPictureInPicture {
   /// await controller.initialize();
   /// await VideoPlayerPip.enterPipMode(controller, width: 300, height: 200);
   /// ```
-  static Future<bool> enterPipMode(VideoPlayerController controller, {int? width, int? height}) {
-    if (controller.playerId == VideoPlayerController.kUninitializedPlayerId) {
-      debugPrint('VideoPlayerPip: Cannot enter PiP mode with uninitialized controller');
-      return Future.value(false);
-    }
-
+  static Future<bool> enterPipMode(VideoPlayerController controller, double width, double height) {
     // iOS implementation uses native PiP
-    return _platform.enterPipMode(controller.playerId, width: width, height: height);
+    return _platform.enterPipMode(width, height);
   }
 
   /// Exits Picture-in-Picture mode if currently active.
@@ -100,13 +95,13 @@ class VideoPlayerPictureInPicture {
   /// - [height]: Desired height of the PiP window (in pixels)
   ///
   /// Returns `true` if the operation was successful, or `false` otherwise.
-  Future<bool> togglePipMode(VideoPlayerController controller, {int? width, int? height}) async {
+  Future<bool> togglePipMode(VideoPlayerController controller, double width, double height) async {
     final bool isInPip = await isInPipMode();
 
     if (isInPip) {
       return await exitPipMode();
     } else {
-      return await enterPipMode(controller, width: width, height: height);
+      return await enterPipMode(controller, width, height);
     }
   }
 

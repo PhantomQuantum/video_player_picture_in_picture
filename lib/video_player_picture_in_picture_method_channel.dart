@@ -20,13 +20,9 @@ class VideoPlayerPictureInPictureMethodChannel extends VideoPlayerPictureInPictu
   }
 
   @override
-  Future<bool> enterPipMode(int playerId, {int? width, int? height}) async {
+  Future<bool> enterPipMode(double width, double height) async {
     try {
-      final result = await methodChannel.invokeMethod<bool>('enterPipMode', {
-        'playerId': playerId,
-        if (width != null) 'width': width,
-        if (height != null) 'height': height,
-      });
+      final result = await methodChannel.invokeMethod<bool>('enterPipMode', {'width': width, 'height': height});
       return result ?? false;
     } on PlatformException catch (e) {
       debugPrint('Error entering PiP mode: ${e.message}');

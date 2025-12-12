@@ -7,11 +7,10 @@ import 'package:video_player_picture_in_picture/video_player_picture_in_picture_
 class MockVideoPlayerPictureInPicturePlatform
     with MockPlatformInterfaceMixin
     implements VideoPlayerPictureInPicturePlatformInterface {
-  @override
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<bool> enterPipMode(int playerId, {int? width, int? height}) {
+  Future<bool> enterPipMode(double width, double height) {
     // TODO: implement enterPipMode
     throw UnimplementedError();
   }

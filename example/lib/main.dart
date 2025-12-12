@@ -77,6 +77,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
       _videoInitialized = true;
     } catch (e) {
+      // ignore: avoid_print
       print(e);
       setState(() {
         _debugStatus = "Error initializing VideoPlayerController: $e";
@@ -123,10 +124,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
       floatingActionButton: _videoInitialized
           ? FloatingActionButton(
               onPressed: () {
-                final aspectRatio = _controller.value.aspectRatio;
-                const width = 300;
-                final height = width / aspectRatio;
-                _controller.enterPipMode(width: width, height: height.toInt());
+                final width = _controller.value.size.width;
+                final height = _controller.value.size.height;
+                _controller.enterPipMode(width: width, height: height);
               },
               child: const Icon(Icons.picture_in_picture),
             )
