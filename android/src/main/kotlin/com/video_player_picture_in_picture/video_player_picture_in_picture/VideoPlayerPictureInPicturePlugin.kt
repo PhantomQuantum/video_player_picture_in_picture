@@ -56,8 +56,8 @@ class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, Activ
             "isInPipMode" -> result.success(isInPipMode)
 
             "setAspectRatio" -> {
-                val width = call.argument<Double>("width") ?: 16
-                val height = call.argument<Double>("height") ?: 9
+                val width = (call.argument<Double>("width") ?: 16.0).toInt()
+                val height = (call.argument<Double>("height") ?: 9.0).toInt()
                 defaultAspectRatio = Rational(width, height)
                 result.success(true)
             }
