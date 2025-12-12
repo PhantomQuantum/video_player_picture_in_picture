@@ -17,7 +17,10 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
+import android.os.Handler
+import android.os.Looper
 
 class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
     private val TAG = "VideoPlayerPictureInPicturePlugin"
@@ -80,10 +83,14 @@ class VideoPlayerPictureInPicturePlugin: FlutterPlugin, MethodCallHandler, Activ
             return false
         }
 
-        if (activity.lifecycle.currentState != Lifecycle.State.RESUMED) {
-            Log.w(TAG, "Activity is not resumed — skip PiP")
-            return false
-        }
+//        val componentActivity = activity as? ComponentActivity
+//        if (componentActivity?.lifecycle?.currentState != Lifecycle.State.RESUMED) {
+//            // 延迟重试 PiP
+//            Handler(Looper.getMainLooper()).post {
+//                enterPipMode()
+//            }
+//            return false
+//        }
 
         return try {
             val paramsBuilder = PictureInPictureParams.Builder()
